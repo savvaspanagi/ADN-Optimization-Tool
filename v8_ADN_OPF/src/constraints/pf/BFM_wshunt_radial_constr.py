@@ -1,6 +1,6 @@
 from pyomo.environ import Constraint
 
-def add_active_power_flow_bfm(self, pder_contrl_var, p_line_var,p_line_reverse_var, p_transformer_var,p_transformer_reverse_var, pgrid_var,ev_ch_p_var, name_prefix):
+def add_active_power_flow_bfm(self, pder_contrl_var, p_line_var,p_line_reverse_var, p_transformer_var,p_transformer_reverse_var, pgrid_var,ev_ch_p_var, name_prefix, p_hp_var=None):
     model = self.model
 
     def active_power_balance(model, j, time):
@@ -10,6 +10,7 @@ def add_active_power_flow_bfm(self, pder_contrl_var, p_line_var,p_line_reverse_v
                 + sum(pgrid_var[bus, time] for bus in model.SGrid if bus == j)
                 - sum(model.Load_P[bus, time] for bus in model.SLoadbuses if bus == j)
                 - sum(ev_ch_p_var[bus, time] for bus in model.SEVbuses if bus == j)
+                - sum(p_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
             == sum(p_line_var[j, k, time] for k in model.Sdownstream[j])
             + sum(p_line_reverse_var[j, k, time] for k in model.Supstream[j])
             +sum(p_transformer_var[j, k, time] for k in model.Sdownstream_transformer[j])
@@ -19,7 +20,7 @@ def add_active_power_flow_bfm(self, pder_contrl_var, p_line_var,p_line_reverse_v
     constraint = Constraint(model.Sbuses, model.STimes, rule=active_power_balance)
     self.register_constraint(name_prefix, constraint)
 
-def add_reactive_power_flow_bfm(self, qder_contr_var, q_line_var,q_line_reverse_var, q_transformer_var,q_transformer_reverse_var, qgrid_var, ev_ch_q_var, name_prefix):
+def add_reactive_power_flow_bfm(self, qder_contr_var, q_line_var,q_line_reverse_var, q_transformer_var,q_transformer_reverse_var, qgrid_var, ev_ch_q_var, name_prefix, q_hp_var=None):
     model = self.model
 
     def reactive_power_balance(model, j, time):
@@ -29,6 +30,7 @@ def add_reactive_power_flow_bfm(self, qder_contr_var, q_line_var,q_line_reverse_
             + sum(qgrid_var[bus, time] for bus in model.SGrid if bus == j)
             - sum(model.Load_Q[bus, time] for bus in model.SLoadbuses if bus == j)
             - sum(ev_ch_q_var[bus, time] for bus in model.SEVbuses if bus == j)
+            - sum(q_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
             == sum(q_line_var[j, k, time] for k in model.Sdownstream[j])
             + sum(q_line_reverse_var[j, k, time] for k in model.Supstream[j])
             + sum(q_transformer_var[j, k, time] for k in model.Sdownstream_transformer[j])

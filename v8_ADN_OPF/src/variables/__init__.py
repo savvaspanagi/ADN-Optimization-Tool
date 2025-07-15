@@ -5,3 +5,5 @@ from .def_ev_var import *
 from .def_line_var import *
 from .def_ev_flex import *
 from .time_manager import *
+from .def_building_var import *
+from .def_hp_var import *

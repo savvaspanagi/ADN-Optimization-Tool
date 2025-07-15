@@ -8,7 +8,6 @@ class AdditionalData:
         
         net=manager.net
         self.net=net 
-        
         # Ancillary DataFrames and constants
         self.f = 50  # Frequency in Hz
         self.S_Base = net.sn_mva
@@ -27,6 +26,7 @@ class AdditionalData:
 
         self.system_data_ev = pd.DataFrame()
         self.system_data_ev_char = pd.DataFrame()
+        self.system_data_hp=pd.DataFrame()
 
     def define_nodes(self):
         NB = len(self.net.bus)
@@ -158,6 +158,69 @@ class AdditionalData:
         # Append new EV data to the existing EV DataFrame
         self.system_data_ev = pd.concat([self.system_data_ev, new_ev], ignore_index=True)
         self.system_data_ev_char = pd.concat([self.system_data_ev_char, new_ev_char], ignore_index=True)
+
+        return
+    
+    #################################----------------- Flexible Building Heat Pump ---------------------############################# 
+
+
+    def addFlexBuilding(self, node, P_min, P_max, RC_Parameters, Initialization, model_Type, time_interval, timeframe, temp_preference=None, COP=None, Qmin=None, Qmax=None, costh_HP=0.95, P_control="controllable", Q_control="constant_pf"):
+        """
+        Add a Heat Pump (HP) to the system with user-defined parameters.
+        If COP is not provided, a default COP curve is generated as a function of outdoor temperature.
+        """
+        # Initialize DataFrame if not already present
+        if not hasattr(self, 'system_data_hp') or self.system_data_hp.empty:
+            self.system_data_hp = pd.DataFrame()
+
+        if Qmin == None:
+            Qmin=-P_max
+        if Qmax == None:
+            Qmax=P_max
+            
+        # Determine number of time steps
+        num_steps = int((timeframe * 60) / time_interval)
+
+        # Generate default temperature preference DataFrame if not provided
+        if temp_preference is None:
+            temp_preference = pd.DataFrame({
+                'Tmin': [20.0] * num_steps,
+                'Tmax': [22.0] * num_steps
+            })
+        else:
+            # Validate input
+            if not isinstance(temp_preference, pd.DataFrame):
+                raise ValueError("Temperature preference must be a pandas DataFrame.")
+            if list(temp_preference.columns) != ['Tmin', 'Tmax']:
+                raise ValueError("Temperature preference DataFrame must have columns: ['Tmin', 'Tmax'].")
+            if len(temp_preference) != num_steps:
+                raise ValueError("Temperature preference length must match simulation time steps.")
+            
+        # Handle COP: if None, generate a default COP curve (example linear)
+        if COP is None:
+            # Example: COP = 2.5 + 0.1 * Tout for Tout in range -5 to 20°C
+            tout_range = np.arange(-5, 21, 1)
+            cop_values = 2.5 + 0.1 * tout_range
+            COP = pd.DataFrame({'Tout': tout_range, 'COP': cop_values})
+
+        # Create HP entry
+        new_hp = pd.DataFrame({
+            'HP_node': [node],
+            'P_min': [P_min / 1000 / self.S_Base],
+            'P_max': [P_max / 1000 / self.S_Base],
+            'RC_Parameters': [RC_Parameters],
+            'Initialization': [Initialization],
+            'model_type': [model_Type],
+            'temp_preference': [temp_preference],
+            'COP_curve': [COP],  # DataFrame with COP vs Tout
+            'Qmin': [Qmin / 1000 / self.S_Base],
+            'Qmax': [Qmax / 1000 / self.S_Base],
+            'costh_HP': [costh_HP],
+            'P_control': [P_control],
+            'Q_control': [Q_control]
+        })
+
+        self.system_data_hp = pd.concat([self.system_data_hp, new_hp], ignore_index=True)
 
         return
         

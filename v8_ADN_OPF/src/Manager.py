@@ -49,8 +49,18 @@ class Manager:
         for func in constrain_fun:
             setattr(self, func.__name__, MethodType(func, self))
 
+        # Registering hp and building variable functions 
+        constrain_fun = [initialize_hp_variables, initialize_building_variables]
+        for func in constrain_fun:
+            setattr(self, func.__name__, MethodType(func, self))
+
         # Registering parameter functions 
         param_fun = [der_profile_param, initialize_ev_params,initialize_ev_char_params, line_param, load_profile_param, transformer_param, alpha_bfm_param]
+        for func in param_fun:
+            setattr(self, func.__name__, MethodType(func, self))
+
+        # Registering heatpumps parameter functions 
+        param_fun = [initialize_hp_params, enviroment_profile_param]
         for func in param_fun:
             setattr(self, func.__name__, MethodType(func, self))
 
@@ -61,6 +71,11 @@ class Manager:
 
         # Registering ev constraint functions 
         constrain_fun = [add_ev_soc_constraint, add_ev_min_departure_soc_constraint, add_power_up_flex_ev_cons, add_power_up_flex_max_cons, add_power_down_flex_ev_cons, add_power_down_flex_min_cons, add_power_ch_dp_ev_cons, fix_ev_non_charging_times]
+        for func in constrain_fun:
+            setattr(self, func.__name__, MethodType(func, self))
+
+        # Registering hp constraint functions 
+        constrain_fun = [add_building_thermodynamic_constraint, add_HP_operation_constraint]
         for func in constrain_fun:
             setattr(self, func.__name__, MethodType(func, self))
         

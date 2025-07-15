@@ -33,6 +33,7 @@ def initialize_sets(self):
     
     System_Data_EV=self.anc_Vars.system_data_ev
     System_Data_EV_char=self.anc_Vars.system_data_ev_char
+    System_Data_HP = self.anc_Vars.system_data_hp
     
     # max indices represent the maximum length of the 'departure' list in System_Data_EV_char
     max_indices=System_Data_EV_char['departure'].apply(len).max() if not System_Data_EV_char.empty else 0
@@ -43,6 +44,10 @@ def initialize_sets(self):
     self.register_set("SEVbuses", SEVbuses)
     self.register_set("SDistance_ind", SDistance_ind)
 
+    HP_nodes = System_Data_HP['HP_node'] if 'HP_node' in System_Data_HP else []
+    SHPbuses = Set(initialize=HP_nodes if len(HP_nodes) > 0 else [])
+
+    self.register_set("SHPbuses", SHPbuses)
     
     # Downstream: for each bus j, the set of k such that (j, k) is a branch
     def downstream_init(model, j):

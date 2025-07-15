@@ -1,6 +1,6 @@
 from pyomo.environ import Constraint, cos, sin
 
-def add_active_power_flow_df_wos_constraint(self, pder_contrl_var, pline_var, p_transformer_var, pgrid_var, ev_ch_p_var, line_current_var, transformer_current_var, name_prefix):
+def add_active_power_flow_df_wos_constraint(self, pder_contrl_var, pline_var, p_transformer_var, pgrid_var, ev_ch_p_var, line_current_var, transformer_current_var, name_prefix, p_hp_var=None):
     """
     Adds the active power flow constraint to the model using Constraintself.
 
@@ -18,6 +18,7 @@ def add_active_power_flow_df_wos_constraint(self, pder_contrl_var, pline_var, p_
                 + sum(pgrid_var[bus, time] for bus in model.SGrid if bus == j)
                 - sum(model.Load_P[bus, time] for bus in model.SLoadbuses if bus == j)
                 - sum(ev_ch_p_var[bus, time] for bus in model.SEVbuses if bus == j)
+                - sum(p_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
                 ==
             sum(pline_var[j, k, time] for k in model.Sdownstream[j])
             - sum((pline_var[i, j, time] - model.resistance_Parm[i, j] * line_current_var[i, j, time]) for i in model.Supstream[j])
@@ -29,7 +30,7 @@ def add_active_power_flow_df_wos_constraint(self, pder_contrl_var, pline_var, p_
     self.register_constraint(name_prefix, constraint)
 
 
-def add_reactive_power_flow_df_wos_constraint(self, qder_contr_var, qline_var, q_transformer_var, qgrid_var, ev_ch_q_var, line_current_var, transformer_current_var, name_prefix):
+def add_reactive_power_flow_df_wos_constraint(self, qder_contr_var, qline_var, q_transformer_var, qgrid_var, ev_ch_q_var, line_current_var, transformer_current_var, name_prefix, q_hp_var=None):
     """
     Adds the reactive power flow constraint to the model using Constraintself.
 
@@ -48,6 +49,7 @@ def add_reactive_power_flow_df_wos_constraint(self, qder_contr_var, qline_var, q
             + sum(qgrid_var[bus, time] for bus in model.SGrid if bus == j)
             - sum(model.Load_Q[bus, time] for bus in model.SLoadbuses if bus == j)
             - sum(ev_ch_q_var[bus, time] for bus in model.SEVbuses if bus == j)
+            - sum(q_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
             ==
             sum(qline_var[j, k, time] for k in model.Sdownstream[j])
             - sum((qline_var[i, j, time] - model.reactance_Parm[i, j] * line_current_var[i, j, time]) for i in model.Supstream[j])

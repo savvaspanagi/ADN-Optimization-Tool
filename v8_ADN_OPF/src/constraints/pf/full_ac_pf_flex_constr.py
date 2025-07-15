@@ -1,6 +1,6 @@
 from pyomo.environ import Constraint, cos, sin
 
-def add_active_power_flex_flow_constraint(self, pder_contrl_var, pgrid_var, ev_ch_p_var, ev_flex_p_var, voltage_v_var,voltage_pa_var, name_prefix,type):
+def add_active_power_flex_flow_constraint(self, pder_contrl_var, pgrid_var, ev_ch_p_var, ev_flex_p_var, voltage_v_var,voltage_pa_var, name_prefix,type, p_hp_var=None):
     """
     Adds the active power flow constraint to the model using Constraintself.
 
@@ -19,6 +19,7 @@ def add_active_power_flex_flow_constraint(self, pder_contrl_var, pgrid_var, ev_c
             + sum(pgrid_var[bus, time] for bus in model.SGrid if bus == k)
             - sum(model.Load_P[bus, time] for bus in model.SLoadbuses if bus == k)
             - sum(ev_ch_p_var[bus, time] for bus in model.SEVbuses if bus == k)
+            - sum(p_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
             + (
                 sum(ev_flex_p_var[bus, time] for bus in model.SEVbuses if bus == k)
                 if type == "downward"
@@ -40,7 +41,7 @@ def add_active_power_flex_flow_constraint(self, pder_contrl_var, pgrid_var, ev_c
     self.register_constraint(name_prefix, constraint)
 
 
-def add_reactive_power_flex_flow_constraint(self, qder_contr_var, qgrid_var, ev_ch_q_var, voltage_v_var, voltage_pa_var, name_prefix):
+def add_reactive_power_flex_flow_constraint(self, qder_contr_var, qgrid_var, ev_ch_q_var, voltage_v_var, voltage_pa_var, name_prefix, q_hp_var=None):
     """
     Adds the reactive power flow constraint to the model using Constraintself.
 
@@ -59,6 +60,7 @@ def add_reactive_power_flex_flow_constraint(self, qder_contr_var, qgrid_var, ev_
             + sum(qgrid_var[bus, time] for bus in model.SGrid if bus == k)
             - sum(model.Load_Q[bus, time] for bus in model.SLoadbuses if bus == k)
             - sum(ev_ch_q_var[bus, time] for bus in model.SEVbuses if bus == k)
+            - sum(q_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
             ==
             sum(
                 voltage_v_var[k, time]
