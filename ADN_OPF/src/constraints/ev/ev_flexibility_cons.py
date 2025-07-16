@@ -2,7 +2,7 @@ from pyomo.environ import Constraint
 
 ### Please refer to PowerTech 2025 paper for the mathematical formulation of the constraints ###
 
-def add_power_up_flex_ev_cons(self, prefix_name):
+def add_power_up_flex_ev_cons(self, name_prefix):
     
     """
     Adds the EV upward flexibility constraint based on SOC to the Pyomo model.
@@ -26,7 +26,7 @@ def add_power_up_flex_ev_cons(self, prefix_name):
             return model.EVsoc[i,  time - 1] + (model.pup_flex_ev[i,  time] + model.pEVch[i,  time]) * delta <= model.EV_SoC_max_param[i]
 
     constraint = Constraint(model.SEVbuses,  model.STimes, rule=power_up_flex_ev_cons_rule)
-    self.register_constraint(prefix_name, constraint)
+    self.register_constraint(name_prefix, constraint)
 
 def add_power_up_flex_max_cons(self,name_prefix):
     """

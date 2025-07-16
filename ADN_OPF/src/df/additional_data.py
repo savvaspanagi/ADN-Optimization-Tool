@@ -11,11 +11,20 @@ class AdditionalData:
         # Ancillary DataFrames and constants
         self.f = 50  # Frequency in Hz
         self.S_Base = net.sn_mva
+        V_base_list = np.sort(net.bus['vn_kv'].unique())
         self.V_Base = net.bus.iloc[-1,:]['vn_kv']
         self.Z_base = (self.V_Base ** 2) / self.S_Base
         self.I_base = (self.S_Base * 10**6) / (np.sqrt(3) * self.V_Base * 10**3) / 1000
         self.Y_base = self.S_Base / (self.V_Base ** 2)
-        
+        # Create DataFrame
+        self.base_values = pd.DataFrame({
+            'f': self.f,
+            'S_base [MVA]': net.sn_mva,
+            'V_base [kV]': V_base_list,
+            'Z_base [Ohm]': (V_base_list ** 2) / net.sn_mva,
+            'I_base [kA]': (net.sn_mva * 1e6) / (np.sqrt(3) * V_base_list * 1e3) / 1e3,
+            'Y_base [S]': net.sn_mva / (V_base_list ** 2)
+        })
         # Initialize dataframes
         self.System_Data_Nodes = self.define_nodes()
         self.System_Data_Lines = self.define_lines()
@@ -53,10 +62,18 @@ class AdditionalData:
     def define_lines(self):
         km = self.net.line['length_km']
         System_Data_Lines = pd.DataFrame()
+        # System_Data_Lines['Voltage_Level'] = self.net.bus.loc[self.net.line['from_bus']]['vn_kv']
         System_Data_Lines['FROM'] = self.net.line['from_bus']
         System_Data_Lines['TO'] = self.net.line['to_bus']
-        System_Data_Lines['R'] = self.net.line['r_ohm_per_km'] * km / self.Z_base
-        System_Data_Lines['X'] = self.net.line['x_ohm_per_km'] * km / self.Z_base
+        System_Data_Lines = System_Data_Lines.merge(self.net.bus[['vn_kv']], left_on='FROM', right_index=True)
+        # Merge System_Data_Lines με τις τιμές βάσης ανά επίπεδο τάσης
+        System_Data_Lines = System_Data_Lines.merge(
+            self.base_values[['V_base [kV]', 'Z_base [Ohm]']],
+            left_on='vn_kv',
+            right_on='V_base [kV]',
+            how='left')
+        System_Data_Lines['R'] = self.net.line['r_ohm_per_km'] * km / System_Data_Lines['Z_base [Ohm]']
+        System_Data_Lines['X'] = self.net.line['x_ohm_per_km'] * km / System_Data_Lines['Z_base [Ohm]']
         System_Data_Lines['Y'] = 2 * np.pi * self.f * self.net.line['c_nf_per_km'] * km * 1e-9 / self.Y_base
         System_Data_Lines['Imax'] = self.net.line['max_i_ka'] / self.I_base
         return System_Data_Lines

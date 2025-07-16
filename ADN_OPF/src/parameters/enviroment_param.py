@@ -11,7 +11,7 @@ def enviroment_profile_param(self, data, outdoor_temeprature_name_prefix, solar_
     self.register_parameter(outdoor_temeprature_name_prefix, outdoor_temp)
     
     def solar_irradiance_rule(model, bus,  time):
-        return data['Tout'].iloc[time]
+        return data['SolGlob'].iloc[time]
 
     solar_irradiance = Param(model.SHPbuses,model.STimes, initialize=solar_irradiance_rule, mutable=True)
     self.register_parameter(solar_irradiance_name_prefix, solar_irradiance)

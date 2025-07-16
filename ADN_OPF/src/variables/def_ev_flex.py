@@ -1,7 +1,7 @@
 import math
 from pyomo.environ import Var, NonNegativeReals
 
-def initialize_ev_flexibility_variables(self, ev_ch_dp_name_prefix, pup_flex_ev_name_prefix, pdown_flex_ev_name_prefix):
+def initialize_ev_flexibility_variables(self, pup_flex_ev_name_prefix, pdown_flex_ev_name_prefix):
     
     """
     This module initializes the electric vehicle (EV) flexibility variables for the optimization model
@@ -15,10 +15,8 @@ def initialize_ev_flexibility_variables(self, ev_ch_dp_name_prefix, pup_flex_ev_
 
     model = self.model
 
-    ev_ch_dp=Var(model.SEVbuses, model.STimes)
     pup_flex_ev=Var(model.SEVbuses, model.STimes,within=NonNegativeReals)
     pdown_flex_ev=Var(model.SEVbuses, model.STimes,within=NonNegativeReals)
 
-    self.register_variable(ev_ch_dp_name_prefix, ev_ch_dp)
     self.register_variable(pup_flex_ev_name_prefix, pup_flex_ev)
     self.register_variable(pdown_flex_ev_name_prefix, pdown_flex_ev)

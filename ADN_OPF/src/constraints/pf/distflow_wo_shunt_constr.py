@@ -18,7 +18,7 @@ def add_active_power_flow_df_wos_constraint(self, pder_contrl_var, pline_var, p_
                 + sum(pgrid_var[bus, time] for bus in model.SGrid if bus == j)
                 - sum(model.Load_P[bus, time] for bus in model.SLoadbuses if bus == j)
                 - sum(ev_ch_p_var[bus, time] for bus in model.SEVbuses if bus == j)
-                - sum(p_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
+                - sum(p_hp_var[bus, time] for bus in model.SHPbuses if bus == j)
                 ==
             sum(pline_var[j, k, time] for k in model.Sdownstream[j])
             - sum((pline_var[i, j, time] - model.resistance_Parm[i, j] * line_current_var[i, j, time]) for i in model.Supstream[j])
@@ -49,7 +49,7 @@ def add_reactive_power_flow_df_wos_constraint(self, qder_contr_var, qline_var, q
             + sum(qgrid_var[bus, time] for bus in model.SGrid if bus == j)
             - sum(model.Load_Q[bus, time] for bus in model.SLoadbuses if bus == j)
             - sum(ev_ch_q_var[bus, time] for bus in model.SEVbuses if bus == j)
-            - sum(q_hp_var[bus, time] for bus in model.SHPbuses if bus == k)
+            - sum(q_hp_var[bus, time] for bus in model.SHPbuses if bus == j)
             ==
             sum(qline_var[j, k, time] for k in model.Sdownstream[j])
             - sum((qline_var[i, j, time] - model.reactance_Parm[i, j] * line_current_var[i, j, time]) for i in model.Supstream[j])

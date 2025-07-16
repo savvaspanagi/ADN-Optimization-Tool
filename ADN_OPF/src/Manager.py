@@ -40,7 +40,7 @@ class Manager:
             setattr(self, func.__name__, MethodType(func, self))
 
         # Registering variable functions 
-        variable_fun = [addTime, initialize_voltage_variables,initialize_voltage_square_variables, initialize_power_variable, initialize_der_variables, initialize_line_variables,initialize_line_square_variables, initialize_ev_variables]
+        variable_fun = [addTime, initialize_voltage_variables,initialize_voltage_square_variables, add_variable, initialize_der_variables, initialize_line_variables,initialize_line_square_variables, initialize_ev_variables]
         for func in variable_fun:
             setattr(self, func.__name__, MethodType(func, self))
         
@@ -80,7 +80,7 @@ class Manager:
             setattr(self, func.__name__, MethodType(func, self))
         
         # Registering line constraint functions 
-        constrain_fun = [add_real_line_flow_constraint, add_reactive_line_flow_constraint, add_line_flow_constraint, add_line_flow_losses_constraint, add_amplitude_constraint_rule, add_line_flow_amplitude_losses_constraint]
+        constrain_fun = [add_real_current_flow_constraint, add_reactive_current_flow_constraint, add_line_flow_losses_constraint, add_twoport_amplitude_constraint,add_oneport_amplitude_constraint, add_line_flow_amplitude_losses_constraint]
         for func in constrain_fun:
             setattr(self, func.__name__, MethodType(func, self))
 
