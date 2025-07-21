@@ -1,6 +1,6 @@
 from pyomo.environ import Constraint, cos, sin
 
-def add_active_power_flow_constraint(self, pder_contrl_var, pgrid_var, ev_ch_p_var, voltage_v_var,voltage_pa_var, name_prefix, p_hp_var=None):
+def add_active_power_flow_constraint(self, pder_contrl_var, pgrid_var, ev_ch_p_var, voltage_v_var,voltage_pa_var, p_hp_var, name_prefix):
     """
     Adds the active power flow constraint to the model using Constraintself.
 
@@ -36,7 +36,7 @@ def add_active_power_flow_constraint(self, pder_contrl_var, pgrid_var, ev_ch_p_v
     self.register_constraint(name_prefix, constraint)
 
 
-def add_reactive_power_flow_constraint(self, qder_contr_var, qgrid_var, ev_ch_q_var, voltage_v_var, voltage_pa_var, name_prefix, q_hp_var=None):
+def add_reactive_power_flow_constraint(self, qder_contr_var, qgrid_var, ev_ch_q_var, voltage_v_var, voltage_pa_var, name_prefix, q_hp_var):
     """
     Adds the reactive power flow constraint to the model using Constraintself.
 

@@ -22,7 +22,7 @@ Reactive current (imaginary part):
 """
 
 
-def add_real_current_flow_constraint(self, current_flow_constr_name_prefix, active_curr_var, voltage_var, phase_angle_var):
+def add_real_current_flow_constraint(self, model_set, current_flow_constr_name_prefix, active_curr_var, voltage_var, phase_angle_var):
     """
     Adds the constraint for real line flow (active power) to the model.
 
@@ -41,10 +41,10 @@ def add_real_current_flow_constraint(self, current_flow_constr_name_prefix, acti
                - voltage_var[t,  time] * sin(phase_angle_var[t,  time])) * model.admitt_mat_Parm_imag[k, t]
         )
 
-    constraint = Constraint(model.Slines,  model.STimes, rule=real_current_flow_rule)
+    constraint = Constraint(model_set,  model.STimes, rule=real_current_flow_rule)
     self.register_constraint(current_flow_constr_name_prefix, constraint)
 
-def add_reactive_current_flow_constraint(self, reactive_flow_constr_name_prefix, reactive_curr_var, voltage_var, phase_angle_var):
+def add_reactive_current_flow_constraint(self, model_set, reactive_flow_constr_name_prefix, reactive_curr_var, voltage_var, phase_angle_var):
     """
     Adds the constraint for reactive line flow to the model.
 
@@ -62,5 +62,5 @@ def add_reactive_current_flow_constraint(self, reactive_flow_constr_name_prefix,
                - voltage_var[t,  time] * cos(phase_angle_var[t,  time])) * model.admitt_mat_Parm_imag[k, t]
         )
     
-    constraint = Constraint(model.Slines,  model.STimes, rule=reactive_line_flow_rule)
+    constraint = Constraint(model_set,  model.STimes, rule=reactive_line_flow_rule)
     self.register_constraint(reactive_flow_constr_name_prefix, constraint)

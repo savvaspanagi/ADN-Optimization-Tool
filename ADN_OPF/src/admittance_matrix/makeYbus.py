@@ -136,17 +136,16 @@ def add_trafo_admittance(net, Ybus):
         tap_pos = row.get('tap_pos', 0)
         tap_neutral = row.get('tap_neutral', 0)
         tap_step = row.get('tap_step_percent', 0)
-        tap_ratio = 1.0
+        tap_ratio = 1.0 
         if tap in ['hv', 'lv']:
             tap_multiplier = 1 + ((tap_pos - tap_neutral) * tap_step / 100)
             tap_ratio = tap_multiplier if tap == 'hv' else 1 / tap_multiplier
 
-        a = tap_ratio
+        a = tap_ratio 
         # Phase shift in degrees to radians
         shift_deg = row.get('shift_degree', 0)
         angle_rad = np.deg2rad(shift_deg)
         phase_shift = np.exp(1j * angle_rad)  # complex rotation factor
-
         # Ybus matrix updates considering shift and asymmetry
         Ybus[fb, fb] += y_tr_new / a**2
         Ybus[tb, tb] += y_tr_new 
@@ -156,9 +155,11 @@ def add_trafo_admittance(net, Ybus):
         i0_percent = row.get('i0_percent', 0)
         pfe_kw = row.get('pfe_kw', 0)
         if i0_percent > 0 or pfe_kw > 0:
+            print("yes")
             # Add shunt admittance to LV side
             g_pfe = pfe_kw / (V_base_lv * 1e3)**2  # conductance from core loss
-            b_mag = i0_percent / 100 / V_base_lv**2  # susceptance estimate
+            print(g_pfe)
+            b_mag = i0_percent / 100 / (V_base_lv * 1e3)**2  # susceptance estimate
             Ybus[tb, tb] += complex(g_pfe, b_mag)
 
     return Ybus

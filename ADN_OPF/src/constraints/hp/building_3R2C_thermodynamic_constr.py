@@ -15,7 +15,8 @@ def add_building_thermodynamic_constraint(self, Tin, Te, Qhp, Tout, Qsol, Q_dyna
     def Q_hp_dynamic(model, bus,  time):
         
         if time == max(model.STimes):
-            return Constraint.Skip
+            return (Qhp[bus,time] == Qhp[bus,time-1])
+            
         return (
              Qhp[bus,time] == (Tin[bus,time+1] - Tin[bus,time]) / (self.delta*60*60) * 
              system_data_hp.set_index('HP_node').loc[bus,'RC_Parameters']['C_in'] / system_data_hp.set_index('HP_node').loc[bus,'RC_Parameters']['fh'] - 

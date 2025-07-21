@@ -66,7 +66,6 @@ class AdditionalData:
         System_Data_Lines['FROM'] = self.net.line['from_bus']
         System_Data_Lines['TO'] = self.net.line['to_bus']
         System_Data_Lines = System_Data_Lines.merge(self.net.bus[['vn_kv']], left_on='FROM', right_index=True)
-        # Merge System_Data_Lines με τις τιμές βάσης ανά επίπεδο τάσης
         System_Data_Lines = System_Data_Lines.merge(
             self.base_values[['V_base [kV]', 'Z_base [Ohm]']],
             left_on='vn_kv',
@@ -75,7 +74,7 @@ class AdditionalData:
         System_Data_Lines['R'] = self.net.line['r_ohm_per_km'] * km / System_Data_Lines['Z_base [Ohm]']
         System_Data_Lines['X'] = self.net.line['x_ohm_per_km'] * km / System_Data_Lines['Z_base [Ohm]']
         System_Data_Lines['Y'] = 2 * np.pi * self.f * self.net.line['c_nf_per_km'] * km * 1e-9 / self.Y_base
-        System_Data_Lines['Imax'] = self.net.line['max_i_ka'] / self.I_base
+        System_Data_Lines['Imax_pu'] = self.net.line['max_i_ka'] / self.I_base
         return System_Data_Lines
 
     def define_transformer(self):
@@ -84,7 +83,14 @@ class AdditionalData:
         System_Data_Transformer['TO'] = self.net.trafo['lv_bus']
         System_Data_Transformer['Sn'] = self.net.trafo['sn_mva'] / self.S_Base # Convert MVA to base
         System_Data_Transformer['vn_hv_kv'] = self.net.trafo['vn_hv_kv'] 
-        System_Data_Transformer['vn_lv_kv'] = self.net.trafo['vn_lv_kv'] 
+        System_Data_Transformer['vn_lv_kv'] = self.net.trafo['vn_lv_kv']
+        System_Data_Transformer['Inom_HV_A'] = (
+        self.net.trafo['sn_mva'] * 1e3 / (np.sqrt(3) * System_Data_Transformer['vn_hv_kv']))
+        System_Data_Transformer['Inom_LV_A'] = (
+        self.net.trafo['sn_mva'] * 1e3 / (np.sqrt(3) * System_Data_Transformer['vn_lv_kv']))
+        System_Data_Transformer = System_Data_Transformer.merge(self.base_values[['V_base [kV]', 'I_base [kA]']], left_on='vn_hv_kv', right_on='V_base [kV]', how='left')
+        System_Data_Transformer['Imax_pu'] = (
+        System_Data_Transformer['Inom_HV_A'] / (System_Data_Transformer['I_base [kA]']*1e3))
         System_Data_Transformer['R'] = self.net.trafo['vkr_percent'] / 100 * self.S_Base / System_Data_Transformer['Sn']
         System_Data_Transformer['X'] = (np.sqrt((self.net.trafo['vk_percent'] / 100) ** 2 - self.net.trafo['vkr_percent'] / 100 ** 2)) * self.S_Base / System_Data_Transformer['Sn']
         return System_Data_Transformer

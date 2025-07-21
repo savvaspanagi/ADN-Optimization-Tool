@@ -7,8 +7,8 @@ def add_HP_operation_constraint(self, Tout_param, Qhp, php, qhp,  php_operation_
 
     def P_hp_operation_rule(model, bus,  time):
         
-        if time == max(model.STimes):
-            return Constraint.Skip
+        # if time == max(model.STimes):
+            # return Constraint.Skip
         T_rounded = round(float(Tout_param[bus, time]()))         
         COP = system_data_hp.set_index('HP_node').loc[bus, 'COP_curve'].set_index('Tout').loc[T_rounded, 'COP']
         return (
@@ -20,8 +20,8 @@ def add_HP_operation_constraint(self, Tout_param, Qhp, php, qhp,  php_operation_
 
     def reactive_hp_operation_rule(model, bus,  time):
         
-        if time == max(model.STimes):
-            return Constraint.Skip
+        # if time == max(model.STimes):
+            # return Constraint.Skip
         q_type = system_data_hp.set_index('HP_node').loc[bus, 'Q_control']
         cosf=system_data_hp.set_index('HP_node').loc[bus,'costh_HP']
 

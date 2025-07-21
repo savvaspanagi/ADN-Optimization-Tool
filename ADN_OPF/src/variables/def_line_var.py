@@ -1,7 +1,7 @@
 import math
 from pyomo.environ import Var, NonNegativeReals
 
-def initialize_line_variables(self, line_set, line_curr_name_prefix=None, line_rea_curr_name_prefix=None, line_act_curr_name_prefix=None, line_losses_name_prefix=None):
+def initialize_line_variables(self, line_set, system_data_df, line_curr_name_prefix=None, line_rea_curr_name_prefix=None, line_act_curr_name_prefix=None, line_losses_name_prefix=None):
     """
     Initialize line-related variables in the Pyomo model.
     """
@@ -9,8 +9,8 @@ def initialize_line_variables(self, line_set, line_curr_name_prefix=None, line_r
     system_data_lines=self.anc_Vars.System_Data_Lines
 
     def Line_Curr_bounds_rule(model, sfrom, sto, time):
-        line_data = system_data_lines.set_index(['FROM', 'TO'])
-        imax = line_data.loc[(sfrom, sto), 'Imax']
+        line_data = system_data_df.set_index(['FROM', 'TO'])
+        imax = line_data.loc[(sfrom, sto), 'Imax_pu']
         return -1 * imax, imax
 
     if line_curr_name_prefix is not None:
@@ -39,7 +39,7 @@ def initialize_line_square_variables(self, line_set, line_curr_name_prefix=None)
     def Line_Curr_bounds_rule(model, sfrom, sto, time):
         line_data = system_data_lines.set_index(['FROM', 'TO'])
         key = (min(sfrom, sto), max(sfrom, sto))
-        imax = line_data.loc[key, 'Imax']
+        imax = line_data.loc[key, 'Imax_pu']
         return 0, imax**2
 
     if line_curr_name_prefix is not None:

@@ -16,6 +16,10 @@ def initialize_sets(self):
     SGrid = Set(initialize=self.anc_Vars.System_Data_Grid['Grid_node'])
     SDER_contr = Set(initialize=self.anc_Vars.System_Data_DER[self.anc_Vars.System_Data_DER['Controllable']==True]['DER_node'])
     SDER_uncontr = Set(initialize=self.anc_Vars.System_Data_DER[self.anc_Vars.System_Data_DER['Controllable']==False]['DER_node'])
+    # load_bus_series = net.load['bus']  # Your current bus Series
+    # load_bus_counts = load_bus_series.groupby(load_bus_series).cumcount() + 1 # Count how many times each bus appears
+    # unique_bus_ids = [f"{bus}.{count}" for bus, count in zip(load_bus_series, load_bus_counts)]
+    # SLoadbuses = Set(initialize=unique_bus_ids)
     SLoadbuses = Set(initialize=net.load['bus'])
     Slines = Set(initialize=list(zip(self.anc_Vars.System_Data_Lines['FROM'], self.anc_Vars.System_Data_Lines['TO'])))
     STransformers = Set(initialize=list(zip(self.anc_Vars.System_Data_Transformers['FROM'], self.anc_Vars.System_Data_Transformers['TO'])))
